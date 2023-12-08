@@ -14,16 +14,22 @@ namespace CranberryAPI.Controllers;
 [ApiController]
 public class UsersController : ControllerBase
 {
+  private readonly CranberryAPIContext _db;
   private readonly UserManager<ApplicationUser> _userManager;
   private readonly SignInManager<ApplicationUser> _signInManager;
   private readonly IConfiguration _configuration;
 
-  public UsersController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration)
+  public UsersController(CranberryAPIContext db, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IConfiguration configuration)
   {
+    _db = db;
     _userManager = userManager;
     _signInManager = signInManager;
     _configuration = configuration;
   }
+
+  // ## # # # # # # # # # # # # # # ##
+  // # USER AUTHENTICATION ENDPOINTS #
+  // ## # # # # # # # # # # # # # # ##
 
   // POST: api/users/register
   [HttpPost("register")]
@@ -93,11 +99,54 @@ public class UsersController : ControllerBase
     return new JwtSecurityTokenHandler().WriteToken(token);
   }
 
+  // ## # # # # # # # # # # # ##
+  // # USER CRUD ENDPOINTS  #
+  // ## # # # # # # # # # # # ##
 
-  // [HttpPost("journals")]
-  // public async Task<ActionResult<Journal>> PostJournal(Journal journal)
-  // {
-  //   _db.Journals.Add(journal);
+  // GET: api/users/{id}
 
-  // }
+  // PUT: api/users/{id}
+
+  // DELETE: api/users/{id}
+
+  // ## # # # # # # # # # # # ##
+  // # USER JOURNAL ENDPOINTS  #
+  // ## # # # # # # # # # # # ##
+
+  // GET: api/users/{id}/journals
+  [HttpGet("{id}/journals")]
+  // [Authorize]
+  public async Task<ActionResult<IEnumerable<Journal>>> GetUserJournals(string id)
+  {
+    List<Journal> userJournals = await _db.Journals.Where(j => j.UserId == id).ToListAsync();
+
+    return Ok(userJournals);
+  }
+
+  // GET: api/users/{id}/journals/{id}
+  [HttpGet("{id}/journals/{journalId}")]
+  // [Authorize]
+  public async Task<IActionResult> GetUserJournal(string id, int journalId)
+  {
+    Journal journal = await _db.Journals.FirstOrDefaultAsync(journal => journal.JournalId == journalId && journal.UserId == id);
+
+    return Ok(journal);
+  }
+
+  // POST: api/users/{id}/journals
+  [HttpPost("{id}/journals")]
+  // [Authorize]
+  public async Task<ActionResult<Journal>> PostJournal(string id, Journal journal)
+  {
+    journal.UserId = id;
+    journal.Date = DateTime.Now; // unless we let user specify the date
+    _db.Journals.Add(journal);
+    await _db.SaveChangesAsync();
+
+    return CreatedAtAction(nameof(GetUserJournal), new { id = id, journalId = journal.JournalId }, journal);
+  }
+
+  // PUT: api/users/{id}/journals/{id}
+
+  // DELETE: api/users/{id}/journals/{id}
 }
