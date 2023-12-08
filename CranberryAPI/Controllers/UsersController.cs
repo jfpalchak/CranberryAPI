@@ -99,13 +99,15 @@ public class UsersController : ControllerBase
     return new JwtSecurityTokenHandler().WriteToken(token);
   }
 
-  // ## # # # # # # # # # # # ##
-  // # USER CRUD ENDPOINTS  #
-  // ## # # # # # # # # # # # ##
+  // ! TODO: AUTHORIZATION:
+  // ! a user should only be able to access & update their own info/journals
+  // ## # # # # # # # # # # ##
+  // #  USER CRUD ENDPOINTS  #
+  // ## # # # # # # # # # # ##
 
   // GET: api/users/{id}
   [HttpGet("{id}")]
-  // [Authorize]
+  // ! [Authorize]
   public async Task<ActionResult> GetUserData(string id) {
 
     ApplicationUser user = await _userManager.FindByIdAsync(id);
@@ -132,7 +134,7 @@ public class UsersController : ControllerBase
 
   // PUT: api/users/{id}
   [HttpPut("{id}")]
-  // [Authorize]
+  // ! [Authorize]
   public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateUserDto userModel)
   {
     ApplicationUser user = await _userManager.FindByIdAsync(id);
@@ -173,7 +175,7 @@ public class UsersController : ControllerBase
 
   // DELETE: api/users/{id}
   [HttpDelete("{id}")]
-  // [Authorize] // only delete account that belongs to the id of the requester
+  // ! [Authorize] // ! only delete account that belongs to the id of the requester
   public async Task<IActionResult> DeleteUser(string id)
   {
 
@@ -212,7 +214,7 @@ public class UsersController : ControllerBase
 
   // GET: api/users/{id}/journals
   [HttpGet("{id}/journals")]
-  // [Authorize]
+  // ! [Authorize]
   public async Task<ActionResult<IEnumerable<Journal>>> GetUserJournals(string id)
   {
     List<Journal> userJournals = await _db.Journals.Where(j => j.UserId == id).ToListAsync();
@@ -232,7 +234,7 @@ public class UsersController : ControllerBase
 
   // POST: api/users/{id}/journals
   [HttpPost("{id}/journals")]
-  // [Authorize]
+  // ! [Authorize]
   public async Task<ActionResult<Journal>> PostJournal(string id, Journal journal)
   {
     journal.UserId = id;
@@ -242,6 +244,8 @@ public class UsersController : ControllerBase
 
     return CreatedAtAction(nameof(GetUserJournal), new { id = id, journalId = journal.JournalId }, journal);
   }
+
+  // TODO : Update user journal, Delete user journal
 
   // PUT: api/users/{id}/journals/{id}
 
