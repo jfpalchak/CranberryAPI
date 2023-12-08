@@ -6,7 +6,7 @@ namespace CranberryAPI.Models;
 
 public class CranberryAPIContext : IdentityDbContext<ApplicationUser>
 {
-  public DbSet<Entry> Entries { get; set; }
+  public DbSet<Journal> Journals { get; set; }
 
   public CranberryAPIContext(DbContextOptions<CranberryAPIContext> options) : base(options) { }
 }

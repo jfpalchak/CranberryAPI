@@ -6,5 +6,5 @@ namespace CranberryAPI.Models;
 public class ApplicationUser : IdentityUser
 {
   [JsonIgnore]
-  public List<Entry> Entries { get; set; }
+  public List<Journal> Journals { get; set; }
 }

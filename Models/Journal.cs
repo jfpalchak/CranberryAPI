@@ -3,9 +3,9 @@ using System.Text.Json.Serialization;
 
 namespace CranberryAPI.Models;
 
-public class Entry
+public class Journal
 {
-  public int EntryId { get; set; }
+  public int JournalId { get; set; }
 
   public DateTime Date { get; set; }
 
