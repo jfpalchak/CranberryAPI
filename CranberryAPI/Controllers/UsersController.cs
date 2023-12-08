@@ -49,4 +49,55 @@ public class UsersController : ControllerBase
       return BadRequest(result.Errors);
     }
   }
+
+  // POST: api/users/signin
+  [HttpPost("signin")]
+  public async Task<IActionResult> SignIn(SignInDto userInfo) 
+  {
+    ApplicationUser user = await _userManager.FindByEmailAsync(userInfo.Email);
+
+    if (user != null)
+    {
+      var signInResult = await _signInManager.PasswordSignInAsync(user, userInfo.Password, isPersistent: false, lockoutOnFailure: false);
+      if (signInResult.Succeeded)
+      {
+        List<Claim> authClaims = new List<Claim>
+        {
+          new Claim("userId", user.Id),
+          new Claim("userName", user.UserName)
+        };
+
+        var newToken = CreateToken(authClaims);
+
+        return Ok(new { status = "Success", message = $"{userInfo.Email} signed in.", token = newToken });
+      }
+    }
+
+    return BadRequest(new { status = "Error", message = "Unable to sign in." });
+  }
+
+  // Generate a user's Token
+  private string CreateToken(List<Claim> authClaims)
+  {
+    SymmetricSecurityKey authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+
+    JwtSecurityToken token = new JwtSecurityToken(
+      issuer: _configuration["JWT:ValidIssuer"],
+      audience: _configuration["JWT:ValidAudience"],
+      expires: DateTime.Now.AddHours(12),
+      claims: authClaims,
+      signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+    );
+
+    // Serialize and return our newly created Token:
+    return new JwtSecurityTokenHandler().WriteToken(token);
+  }
+
+
+  // [HttpPost("journals")]
+  // public async Task<ActionResult<Journal>> PostJournal(Journal journal)
+  // {
+  //   _db.Journals.Add(journal);
+
+  // }
 }
