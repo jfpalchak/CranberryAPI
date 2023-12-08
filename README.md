@@ -169,7 +169,7 @@ Or, [Download and install the appropriate version of MySQL Workbench](https://de
 
   #### Download
 
-  1) Navigate to the [ParkLookup Api repository here](https://github.com/jfpalchak/CranberryAPI.git).
+  1) Navigate to the [Cranberry API repository here](https://github.com/jfpalchak/CranberryAPI.git).
   2) Click 'Clone or download' to reveal the HTTPS url ending with .git and the 'Download ZIP' option.
   3) Click 'Download ZIP' and extract.
   4) Open by double clicking on any of the files to open in a text editor.
@@ -216,7 +216,7 @@ Or, [Download and install the appropriate version of MySQL Workbench](https://de
 Explore the API endpoints in Postman or a browser. However, take note: you will not be able to utilize authentication in a browser.
 
 ### Using Swagger Documentation 
-To explore the ParkLookup Api with NSwag, launch the project using `dotnet run` with the Terminal or Powershell, and input the following URL into your browser: `http://localhost:5000/swagger`
+To explore the Cranberry API with NSwag, launch the project using `dotnet run` with the Terminal or Powershell, and input the following URL into your browser: `http://localhost:5000/swagger`
 
 ### Registering an Account and Using the JSON Web Token
 In order to be authorized to use the `POST`, `PUT`, and `DELETE` functionality of the API, please authenticate yourself through Postman:
@@ -298,7 +298,7 @@ CORS is a W3C standard that allows a server to relax the same-origin policy. It 
 For more information or to see how CORS functions, see the [Microsoft documentation](https://docs.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-2.2#how-cors). -->
 
 <!-- ### Note on Pagination
-For certain endpoints, the ParkLookup Api returns a default of 10 results per page at a time, which is also the maximum number of results possible.
+For certain endpoints, the Cranberry API returns a default of 10 results per page at a time, which is also the maximum number of results possible.
 
 To modify this, use the query parameters `pageSize` and `pageNumber` to alter the response results displayed. The `pageSize` parameter will specify how many results will be displayed, and the `pageNumber` parameter will specify which element in the response the limit should start counting. -->
 
