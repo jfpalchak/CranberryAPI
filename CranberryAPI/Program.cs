@@ -7,6 +7,17 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var MyAllowSpecificOrigins = "_myCranberryCORS";
+builder.Services.AddCors(options => 
+{
+  options.AddPolicy(name: MyAllowSpecificOrigins,
+                    policy => 
+                    {
+                      policy.WithOrigins("http://localhost:3000")
+                      .AllowAnyMethod()
+                      .AllowAnyHeader();
+                    });
+});
 
 builder.Services.AddControllers();
 
@@ -57,6 +68,8 @@ else
 {
   app.UseHttpsRedirection();
 }
+
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthentication();
 
