@@ -104,9 +104,58 @@ public class UsersController : ControllerBase
   // ## # # # # # # # # # # # ##
 
   // GET: api/users/{id}
+  // public async Task<ActionResult<List<Claim>>> GetUserData(string id) {
+
+  //   ApplicationUser user = await _userManager.FindByIdAsync(id);
+
+  //   if (user == null)
+  //   {
+  //     return NotFound();
+  //   }
+
+  // }
 
   // PUT: api/users/{id}
+  [HttpPut("{id}")]
+  public async Task<IActionResult> UpdateUser(string id, UpdateUserModel userModel)
+  {
+    ApplicationUser user = await _userManager.FindByIdAsync(id);
+    if (user == null)
+    {
+      return NotFound();
+    }
+    
+    // Error handling & Validation Checking should go here
+    // will update information to 0 if information is not present in request
+    if (userModel.AvgSmokedDaily != user.AvgSmokedDaily)
+    {
+      user.AvgSmokedDaily = userModel.AvgSmokedDaily;
+    }
+    if (userModel.CigsPerPack != user.CigsPerPack)
+    {
+      user.CigsPerPack = userModel.CigsPerPack;
+    }
+    if (userModel.PricePerPack != user.PricePerPack)
+    {
+      user.PricePerPack = userModel.PricePerPack;
+    }
+    if (userModel.QuitDate != user.QuitDate)
+    {
+      user.QuitDate = userModel.QuitDate;
+    }
 
+    IdentityResult result = await _userManager.UpdateAsync(user);
+
+    if (result.Succeeded)
+    {
+      return NoContent();
+    }
+    else
+    {
+      return BadRequest(result.Errors);
+    }
+  }
+  
   // DELETE: api/users/{id}
 
   // ## # # # # # # # # # # # ##
