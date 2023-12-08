@@ -104,20 +104,36 @@ public class UsersController : ControllerBase
   // ## # # # # # # # # # # # ##
 
   // GET: api/users/{id}
-  // public async Task<ActionResult<List<Claim>>> GetUserData(string id) {
+  [HttpGet("{id}")]
+  // [Authorize]
+  public async Task<ActionResult> GetUserData(string id) {
 
-  //   ApplicationUser user = await _userManager.FindByIdAsync(id);
+    ApplicationUser user = await _userManager.FindByIdAsync(id);
 
-  //   if (user == null)
-  //   {
-  //     return NotFound();
-  //   }
+    if (user == null)
+    {
+      return NotFound();
+    }
 
-  // }
+    UserProfileDto userDto = new()
+    {
+      UserId = user.Id,
+      UserName = user.UserName,
+      QuitDate = user.QuitDate,
+      AvgSmokedDaily = user.AvgSmokedDaily,
+      PricePerPack = user.PricePerPack,
+      CigsPerPack = user.CigsPerPack,
+      // Journals = user.Journals
+    };
+
+    return Ok(userDto);
+
+  }
 
   // PUT: api/users/{id}
   [HttpPut("{id}")]
-  public async Task<IActionResult> UpdateUser(string id, UpdateUserModel userModel)
+  // [Authorize]
+  public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateUserDto userModel)
   {
     ApplicationUser user = await _userManager.FindByIdAsync(id);
     if (user == null)
@@ -126,20 +142,19 @@ public class UsersController : ControllerBase
     }
     
     // Error handling & Validation Checking should go here
-    // will update information to 0 if information is not present in request
-    if (userModel.AvgSmokedDaily != user.AvgSmokedDaily)
+    if (userModel.AvgSmokedDaily != default)
     {
       user.AvgSmokedDaily = userModel.AvgSmokedDaily;
     }
-    if (userModel.CigsPerPack != user.CigsPerPack)
+    if (userModel.CigsPerPack != default)
     {
       user.CigsPerPack = userModel.CigsPerPack;
     }
-    if (userModel.PricePerPack != user.PricePerPack)
+    if (userModel.PricePerPack != default)
     {
       user.PricePerPack = userModel.PricePerPack;
     }
-    if (userModel.QuitDate != user.QuitDate)
+    if (userModel.QuitDate != default)
     {
       user.QuitDate = userModel.QuitDate;
     }
@@ -155,8 +170,41 @@ public class UsersController : ControllerBase
       return BadRequest(result.Errors);
     }
   }
-  
+
   // DELETE: api/users/{id}
+  [HttpDelete("{id}")]
+  // [Authorize] // only delete account that belongs to the id of the requester
+  public async Task<IActionResult> DeleteUser(string id)
+  {
+
+    // Get the ID of the authenticated user:
+    // string authenticatedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+    // if (authenticatedUserId != id)
+    // {
+    //   // The authenticated user is not allowed to delete the account of another user!
+    //   return Forbid();
+    // }
+
+    ApplicationUser user = await _userManager.FindByIdAsync(id);
+
+    if (user != null)
+    {
+      IdentityResult result = await _userManager.DeleteAsync(user);
+      if (result.Succeeded)
+      {
+        return NoContent();
+      }
+      else
+      {
+        return BadRequest(result.Errors);
+      }
+    }
+    else
+    {
+      return NotFound();
+    }
+  }
 
   // ## # # # # # # # # # # # ##
   // # USER JOURNAL ENDPOINTS  #
