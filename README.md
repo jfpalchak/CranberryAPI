@@ -4,10 +4,10 @@
 </h1>
 <p align="center">
     <!-- Project Avatar/Logo -->
-    <!-- <br>
-    <a href="">
-        <img src="">
-    </a> -->
+    <br/>
+    <a href="https://github.com/jfpalchak/cranberry">
+        <img width="100" height="100" src="https://img.icons8.com/external-colored-outline-lafs/100/external-cranberry-flavors-colored-outline-part-2-colored-outline-lafs.png" alt="external-cranberry-flavors-colored-outline-part-2-colored-outline-lafs"/>
+    </a>
     <p align="center">
       ___________________________
     </p>
@@ -77,9 +77,9 @@
 
 ### 📖 Description
 
-The Cranberry API allows users to both register and sign in to their own account, as well as post, put, and delete their own Journal entries. This API utilizes RESTful principles, as well as Json Web Tokens (JWT) for authentication & authorization.
+The Cranberry API allows users to both register and sign in to their own account, as well as post, put, and delete their own Journal entries and account information. This API utilizes RESTful principles, as well as Json Web Tokens (JWT) for authentication & authorization.
 
-Only authenticated users have access to `GET`, `POST`, `PUT`, and certain `DELETE` functionality throughout the API.
+Only authenticated users have access to `GET`, `POST`, `PUT`, and `DELETE` functionality throughout the API.
 
 <!-- Any endpoint in the API that returns a _list_ of Journals utilizes Pagination.  -->
 
@@ -276,7 +276,8 @@ https://localhost:5001/api/users/signin
 {
     "status": "Success",
     "message": "email@test.com signed in.",
-    "token": "xxxx.xxxx.xxxx"
+    "token": "xxxx.xxxx.xxxx",
+    "userId": "xxx"
 }
 ```
 
