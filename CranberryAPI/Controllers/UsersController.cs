@@ -7,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Security.Claims;
 using CranberryAPI.Models;
+using CranberryAPI.Wrappers;
 
 namespace CranberryAPI.Controllers;
 
@@ -75,7 +76,7 @@ public class UsersController : ControllerBase
 
         var newToken = CreateToken(authClaims);
 
-        return Ok(new { status = "Success", message = $"{userInfo.Email} signed in.", token = newToken });
+        return Ok(new { status = "Success", message = $"{userInfo.Email} signed in.", token = newToken, userId = user.Id });
       }
     }
 
@@ -99,20 +100,21 @@ public class UsersController : ControllerBase
     return new JwtSecurityTokenHandler().WriteToken(token);
   }
 
-  // ! TODO: AUTHORIZATION:
-  // ! a user should only be able to access & update their own info/journals
   // ## # # # # # # # # # # ##
   // #  USER CRUD ENDPOINTS  #
   // ## # # # # # # # # # # ##
 
   // GET: api/users/{id}
   [HttpGet("{id}")]
-  // ! [Authorize]
+  [Authorize]
   public async Task<ActionResult> GetUserData(string id) {
 
+    string currentUserId = User.FindFirst("userId")?.Value;
     ApplicationUser user = await _userManager.FindByIdAsync(id);
 
-    if (user == null)
+    // check if requested user exists, 
+    // or if the client isn't requesting their own information
+    if (user == null || currentUserId != id)
     {
       return NotFound();
     }
@@ -128,22 +130,61 @@ public class UsersController : ControllerBase
       // Journals = user.Journals
     };
 
-    return Ok(userDto);
+    var response = new Response<UserProfileDto> {
+      Status = "Success",
+      Message = "User info retrieved successfully.",
+      Data = userDto
+    };
+
+    return Ok(response);
 
   }
 
+  // GET: api/users/profile
+  // [HttpGet("profile")]
+  // [Authorize]
+  // public async Task<ActionResult> GetUserProfile() {
+
+  //   // grab the user's id from the JWT
+  //   string currentUserId = User.FindFirst("userId")?.Value;
+  
+  //   ApplicationUser user = await _userManager.FindByIdAsync(currentUserId);
+
+  //   if (user == null)
+  //   {
+  //     return NotFound();
+  //   }
+
+  //   UserProfileDto userDto = new()
+  //   {
+  //     UserId = user.Id,
+  //     UserName = user.UserName,
+  //     QuitDate = user.QuitDate,
+  //     AvgSmokedDaily = user.AvgSmokedDaily,
+  //     PricePerPack = user.PricePerPack,
+  //     CigsPerPack = user.CigsPerPack,
+  //     // Journals = user.Journals
+  //   };
+
+  //   return Ok(userDto);
+  // }
+
   // PUT: api/users/{id}
   [HttpPut("{id}")]
-  // ! [Authorize]
+  [Authorize]
   public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateUserDto userModel)
   {
     ApplicationUser user = await _userManager.FindByIdAsync(id);
-    if (user == null)
+    string currentUserId = User.FindFirst("userId")?.Value;
+
+    if (user == null || currentUserId != id)
     {
       return NotFound();
     }
     
     // Error handling & Validation Checking should go here
+    // For now: if information is left out of the Put request body,
+    // do not update it
     if (userModel.AvgSmokedDaily != default)
     {
       user.AvgSmokedDaily = userModel.AvgSmokedDaily;
@@ -175,18 +216,17 @@ public class UsersController : ControllerBase
 
   // DELETE: api/users/{id}
   [HttpDelete("{id}")]
-  // ! [Authorize] // ! only delete account that belongs to the id of the requester
+  [Authorize]
   public async Task<IActionResult> DeleteUser(string id)
   {
 
     // Get the ID of the authenticated user:
-    // string authenticatedUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    string currentUserId = User.FindFirst("userId")?.Value;
 
-    // if (authenticatedUserId != id)
-    // {
-    //   // The authenticated user is not allowed to delete the account of another user!
-    //   return Forbid();
-    // }
+    if (currentUserId != id)
+    { // instead of forbid, just don't acknowledge the data exists
+      return NotFound();
+    }
 
     ApplicationUser user = await _userManager.FindByIdAsync(id);
 
@@ -214,40 +254,141 @@ public class UsersController : ControllerBase
 
   // GET: api/users/{id}/journals
   [HttpGet("{id}/journals")]
-  // ! [Authorize]
+  [Authorize]
   public async Task<ActionResult<IEnumerable<Journal>>> GetUserJournals(string id)
   {
     List<Journal> userJournals = await _db.Journals.Where(j => j.UserId == id).ToListAsync();
 
-    return Ok(userJournals);
+    var response = new Response<List<Journal>> {
+      Status = "Success",
+      Message = "Journals retrieved successfully.",
+      Data = userJournals
+    };
+
+    return Ok(response);
   }
 
   // GET: api/users/{id}/journals/{id}
   [HttpGet("{id}/journals/{journalId}")]
-  // [Authorize]
+  [Authorize]
   public async Task<IActionResult> GetUserJournal(string id, int journalId)
   {
+    // Make sure it's the client making the request
+    string currentUserId = User.FindFirst("userId")?.Value;
+    if (currentUserId != id)
+    { 
+      return NotFound();
+    }
+    
     Journal journal = await _db.Journals.FirstOrDefaultAsync(journal => journal.JournalId == journalId && journal.UserId == id);
+    if (journal == null) 
+    {
+      return NotFound();
+    }
 
-    return Ok(journal);
+    var response = new Response<Journal> {
+      Status = "Success",
+      Message = "Journal retrieved successfully.",
+      Data = journal
+    };
+
+    return Ok(response);
   }
 
   // POST: api/users/{id}/journals
   [HttpPost("{id}/journals")]
-  // ! [Authorize]
+  [Authorize]
   public async Task<ActionResult<Journal>> PostJournal(string id, Journal journal)
   {
+    // Make sure it's the client making the request
+    string currentUserId = User.FindFirst("userId")?.Value;
+    if (currentUserId != id)
+    { 
+      return Forbid();
+    }
+
     journal.UserId = id;
     journal.Date = DateTime.Now; // unless we let user specify the date
     _db.Journals.Add(journal);
     await _db.SaveChangesAsync();
 
-    return CreatedAtAction(nameof(GetUserJournal), new { id = id, journalId = journal.JournalId }, journal);
+    var response = new Response<Journal> {
+      Status = "Success",
+      Message = "Journal created successfully.",
+      Data = journal
+    };
+
+    return CreatedAtAction(nameof(GetUserJournal), new { id = id, journalId = journal.JournalId }, response);
   }
 
-  // TODO : Update user journal, Delete user journal
-
   // PUT: api/users/{id}/journals/{id}
+  [HttpPut("{id}/journals/{journalId}")]
+  [Authorize]
+  public async Task<ActionResult> UpdateJournal(string id, int journalId, [FromBody] Journal journal)
+  {
+    // Make sure it's the client making the request
+    string currentUserId = User.FindFirst("userId")?.Value;
+    if (currentUserId != id)
+    { 
+      return Forbid();
+    }
+    if (journalId != journal.JournalId || id != journal.UserId)
+    {
+      return BadRequest();
+    }
+  
+    _db.Journals.Update(journal);
+
+    try 
+    {
+      await _db.SaveChangesAsync();
+    }
+    catch (DbUpdateConcurrencyException)
+    {
+      if (!JournalExists(journalId))
+      {
+        return NotFound();
+      }
+      else
+      {
+        throw;
+      }
+    }
+
+    return NoContent();
+  }
+
+  private bool JournalExists(int id)
+  {
+    return _db.Journals.Any(j => j.JournalId == id);
+  }
 
   // DELETE: api/users/{id}/journals/{id}
+  [HttpDelete("{id}/journals/{journalId}")]
+  [Authorize]
+  public async Task<IActionResult> DeleteJournal(string id, int journalId)
+  {
+    // Make sure it's the client making the request
+    string currentUserId = User.FindFirst("userId")?.Value;
+    if (currentUserId != id)
+    { 
+      return NotFound();
+    }
+
+    Journal journal = await _db.Journals.FindAsync(journalId);
+
+    if (journal == null)
+    {
+      return NotFound();
+    } 
+    else if (id != journal.UserId)
+    {
+      return BadRequest();
+    }
+
+    _db.Journals.Remove(journal);
+    await _db.SaveChangesAsync();
+
+    return NoContent();
+  }
 }

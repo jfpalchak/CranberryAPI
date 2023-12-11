@@ -56,6 +56,11 @@ public class JournalsController : ControllerBase
   // [Authorize]
   public async Task<ActionResult<Journal>> Post(Journal journal)
   {
+
+    // string currentUserId = User.FindFirst("userId")?.Value;
+
+    // journal.UserId = currentUserId;
+
     _db.Journals.Add(journal);
     await _db.SaveChangesAsync();
     return CreatedAtAction(nameof(GetJournal), new { id = journal.JournalId }, journal);
