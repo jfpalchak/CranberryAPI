@@ -44,7 +44,17 @@ public class UsersController : ControllerBase
       return BadRequest(new { status = "Error", message = "Email is already registered." });
     }
 
-    ApplicationUser newUser = new ApplicationUser() { Email = user.Email, UserName = user.UserName};
+    // ApplicationUser newUser = new ApplicationUser() { Email = user.Email, UserName = user.UserName };
+    ApplicationUser newUser = new ApplicationUser() 
+    { 
+      Email = user.Email, 
+      UserName = user.UserName,
+      QuitDate = user.QuitDate,
+      AvgSmokedDaily = user.AvgSmokedDaily,
+      PricePerPack = user.PricePerPack,
+      CigsPerPack = user.CigsPerPack
+    };
+
     IdentityResult result = await _userManager.CreateAsync(newUser, user.Password);
 
     if (result.Succeeded)
