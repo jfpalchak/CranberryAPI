@@ -3,6 +3,7 @@ using System;
 using CranberryAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CranberryAPI.Migrations
 {
     [DbContext(typeof(CranberryAPIContext))]
-    partial class CranberryAPIContextModelSnapshot : ModelSnapshot
+    [Migration("20231215202021_ChangePricePerPackToTypeFloat")]
+    partial class ChangePricePerPackToTypeFloat
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
