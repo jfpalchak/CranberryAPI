@@ -12,9 +12,9 @@ public class RegisterDto
   [Required]
   public string Password { get; set; }
 
-  public DateTime QuitDate { get; set; }
+  public string QuitDate { get; set; }
   public int AvgSmokedDaily { get; set; }
   public int PricePerPack { get; set; }
   public int CigsPerPack { get; set; }
-  
+
 }

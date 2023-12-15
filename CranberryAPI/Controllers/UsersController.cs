@@ -318,7 +318,7 @@ public class UsersController : ControllerBase
     }
 
     journal.UserId = id;
-    journal.Date = DateTime.Now; // unless we let user specify the date
+    // journal.Date = DateTime.Now;
     _db.Journals.Add(journal);
     await _db.SaveChangesAsync();
 
