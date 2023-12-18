@@ -283,7 +283,7 @@ http://localhost:5000/api/users/signin
 
 Here's an example of what this should look like in Postman:
 
-<a href="https://ibb.co/4tP1HRT"><img src="https://i.ibb.co/JjCK9cc/SignIn.png" alt="SignIn endpoint in Postman" border="0" /></a>
+<a href="https://ibb.co/vXGCrG1"><img src="https://i.ibb.co/z6YWLYs/Screenshot-2023-12-17-at-10-56-36-PM.png" alt="Sign In endpoint in Postman" border="0"></a>
 
 #### Using the JSON Web Token
 Now let's copy that token from the response, and add it as an authorization header to our next request. Copy the token from the body, and click on the Authorization tab in Postman. On the 'Type', make sure that is set to 'Bearer Token', and then paste in the token in the field on the right.
