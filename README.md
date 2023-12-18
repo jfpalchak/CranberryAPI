@@ -334,12 +334,12 @@ Base URL: `https://localhost:5001`
 | PUT      | <a href="#get-apiusersidjournals"> /api/users/{id}/journals/{id} </a>  |
 | DELETE   | <a href="#get-apiusersidjournals"> /api/users/{id}/journals/{id} </a>  |
 
-|            |                    Journals                                            |
+<!-- |            |                    Journals                                            |
 |    :---:   |                      :---                                              |
 | GET        | <a href="#apijournals"> /api/journals/ </a>                            |  
 | POST       | <a href="#apijournals"> /api/journals/</a>                             |  
 | PUT        | <a href="#apijournals"> /api/journals/{id} </a>                        |  
-| DELETE     | <a href="#apijournals"> /api/journals/{id} </a>                        |  
+| DELETE     | <a href="#apijournals"> /api/journals/{id} </a>                        |   -->
 
 ..........................................................................................
 
