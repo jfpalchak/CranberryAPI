@@ -151,33 +151,39 @@ public class UsersController : ControllerBase
   }
 
   // GET: api/users/profile
-  // [HttpGet("profile")]
-  // [Authorize]
-  // public async Task<ActionResult> GetUserProfile() {
+  [HttpGet("profile")]
+  [Authorize]
+  public async Task<ActionResult> GetUserProfile() {
 
-  //   // grab the user's id from the JWT
-  //   string currentUserId = User.FindFirst("userId")?.Value;
+    // grab the user's id from the JWT
+    string currentUserId = User.FindFirst("userId")?.Value;
   
-  //   ApplicationUser user = await _userManager.FindByIdAsync(currentUserId);
+    ApplicationUser user = await _userManager.FindByIdAsync(currentUserId);
 
-  //   if (user == null)
-  //   {
-  //     return NotFound();
-  //   }
+    if (user == null)
+    {
+      return NotFound();
+    }
 
-  //   UserProfileDto userDto = new()
-  //   {
-  //     UserId = user.Id,
-  //     UserName = user.UserName,
-  //     QuitDate = user.QuitDate,
-  //     AvgSmokedDaily = user.AvgSmokedDaily,
-  //     PricePerPack = user.PricePerPack,
-  //     CigsPerPack = user.CigsPerPack,
-  //     // Journals = user.Journals
-  //   };
+    UserProfileDto userDto = new()
+    {
+      UserId = user.Id,
+      UserName = user.UserName,
+      QuitDate = user.QuitDate,
+      AvgSmokedDaily = user.AvgSmokedDaily,
+      PricePerPack = user.PricePerPack,
+      CigsPerPack = user.CigsPerPack,
+      // Journals = user.Journals
+    };
 
-  //   return Ok(userDto);
-  // }
+  var response = new Response<UserProfileDto> {
+      Status = "Success",
+      Message = "User info retrieved successfully.",
+      Data = userDto
+    };
+
+    return Ok(userDto);
+  }
 
   // PUT: api/users/{id}
   [HttpPut("{id}")]
