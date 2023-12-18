@@ -221,7 +221,7 @@ To explore the Cranberry API with NSwag, launch the project using `dotnet run` w
 ### Registering an Account and Using the JSON Web Token
 In order to be authorized to use the `GET`, `POST`, `PUT`, and `DELETE` functionality of the API, please authenticate yourself through Postman:
 
-#### Registration
+### Registration
 Again, we'll be using Postman for this example. Let's setup a `POST` request to the `users/register` endpoint. Select the 'Body' tab, choose the 'raw' radio button, and select 'JSON' from the dropdown selection.
 
 In the Body of the Post request, use the following format:
@@ -254,7 +254,7 @@ Note that the password must contain at least six characters, one non-alphanumeri
 
 <a href="https://ibb.co/y00H6yS"><img src="https://i.ibb.co/VVVfgSm/Password-Req.png" alt="Password-Req error in Postman" border="0" /></a>     
 
-#### Sign In
+### `POST` Sign In
 Now that we've registered an account with our API, we'll need to authenticate our account and generate a JSON Web Token. We'll be using Postman again for this example. 
 
 Let's setup another `POST` request to the `users/signin` endpoint. Select the 'Body' tab, choose the 'raw' radio button, and select 'JSON' from the dropdown selection.
@@ -321,8 +321,8 @@ Base URL: `https://localhost:5001`
 
 |          |                      Users                                             |
 |  :---:   |                      :---                                              |
-| POST     | <a href="#get-apiusersregister"> /api/users/register </a>              |
-| POST     | <a href="#post-apiuserssignin"> /api/users/signin </a>                 |
+| POST     | <a href="#register"> /api/users/register </a>                          |
+| POST     | <a href="#signin"> /api/users/signin </a>                              |
 | GET      | <a href="#get-apiusersprofile"> /api/users/profile </a>                |  
 |          |                                                                        |
 | GET      | <a href="#get-apiusersid"> /api/users/{id} </a>                        |
@@ -352,7 +352,7 @@ Access functionality to register, sign-in & receive a Token, as well as edit or 
 
 #### This is an alternative endpoint to `GET` `/api/users/{id}`
 
-Only authenticated users, while including their Token in the authorization header of the request, may access this `GET` endpoint. On a successful request, this endpoint returns the User's registered information.
+Authenticated users, while including their Token in the authorization header of the request, may access this `GET` endpoint. On a successful request, this endpoint returns the User's registered information.
 
 **NOTE**: An authenticated user is only authorized to retrieve their own information, and upon successfully calling this endpoint, will receive only their own registered information.
 
@@ -389,7 +389,7 @@ https://localhost:5001/api/users/1
 
 #### This is an alternative endpoint to `GET` `/api/users/profile`
 
-Only authenticated users, while including their Token in the authorization header of the request, may access this `GET` endpoint. On a successful request, this endpoint returns the User's registered information.
+Authenticated users, while including their Token in the authorization header of the request, may access this `GET` endpoint. On a successful request, this endpoint returns the User's registered information.
 
 **NOTE**: An authenticated user is only authorized to retrieve their own information. If an ID belonging to an account other than the authenticated user is used, regardless of a present bearer token, the request will receive a 404 response.
 
@@ -447,7 +447,7 @@ https://localhost:5001/api/users/1
      "cigsPerPack": 20
 }
 ```
-> NOTE: When sending a `PUT` request, the Park's ID is _required_ in the body of the request.
+> NOTE: When sending a `PUT` request, the User's ID is _required_ in the body of the request.
 
 #### Sample Successful JSON Response
 `Status: 204 No Content`
@@ -457,6 +457,7 @@ https://localhost:5001/api/users/1
 ..........................................................................................
 
 ### `DELETE` /api/users/{id}
+
 Authenticated users, while including their Token in the authorization header of the request, may `DELETE` their own registered account
 
 **NOTE**: An authenticated user is only authorized to access and update their own information. Attempting to access this endpoint with a User ID that does not belong to the authenticated user will result in an unsuccessful request. 
@@ -479,58 +480,122 @@ https://localhost:5001/api/users/1
 
 ..........................................................................................
 
-<!-- #### HTTP Request Structure
+### `GET` /api/users/{id}/journals
 
-### `GET` /api/parks/{id}
-Any user may access this `GET` endpoint of the API. This endpoint returns a single Park entry that matches the given Park ID. 
+Authenticated users, while including their Token in the authorization header of the request, may access this `GET` endpoint. On a successful request, this endpoint returns a list of all the User's Journal submissions.
+
+**NOTE**: An authenticated user is only authorized to access and update their own journals. Attempting to access this endpoint with a User ID that does not belong to the authenticated user will result in an unsuccessful request. 
 
 #### Path Parameters
 | Parameter | Type | Default | Required | Description |
 | :---: | :---: | :---: | :---: | --- |
-| id | int | none | true | Specify the desired Park according to the given Park ID. |
+| id | int | none | true | Specify the desired user according to the given User ID. |
 
 
 #### Example Query
 ```
-https://localhost:5001/api/parks/3
+https://localhost:5001/api/users/1/journals
 ```
 
 #### Sample Successful JSON Response
 `Status: 200 OK`
 ```json
 {
-    "parkId": 3,
-    "name": "Cape Kiwanda",
-    "location": "Oregon",
-    "description": "This sandstone headland just north of Pacific City offers one of the best viewpoints on the coast for witnessing the ocean's power. The landmark is one of three along the Three Capes Scenic Route (along with Cape Meares and Cape Lookout).",
-    "category": "State Park"
+    "status": "Success",
+    "message": "Journals retrieved successfully.",
+    "data": [
+        {
+            "journalId": 52,
+            "date": "2023-12-13T16:58",
+            "cravingIntensity": 2,
+            "cigsSmoked": 3,
+            "notes": "Notes here.",
+            "userId": "1"
+        },
+        {
+            "journalId": 53,
+            "date": "2023-12-04T16:58",
+            "cravingIntensity": 3,
+            "cigsSmoked": 5,
+            "notes": "Some more notes.",
+            "userId": "1"
+        }
+    ]
 }
 ```
 ..........................................................................................
 
-### `PUT` /api/parks/{id}
-Authenticated users, while including their Token in the authorization header of the request, may `PUT` updates for Park entries in the database when using the following format:
+### `POST` /api/users/{id}/journals/
+
+Authenticated users, while including their Token in the authorization header of the request, may access this `POST` endpoint to create a new journal entry.
+
+**NOTE**: An authenticated user is only authorized to access and update their own journals. Attempting to access this endpoint with a User ID that does not belong to the authenticated user will result in an unsuccessful request. 
 
 #### Path Parameters
 | Parameter | Type | Default | Required | Description |
 | :---: | :---: | :---: | :---: | --- |
-| id | int | none | true | Specify the desired Park according to the given Park ID. |
+| id    | int | none | true | Specify the desired user according to the given User ID. |
 
 #### Example Query
 ```
-https://localhost:5001/api/parks/8
+https://localhost:5001/api/users/1/journals/
 ```
 #### Sample JSON Request Body
 ```json
 {
-  "parkId": 8,
-  "name": "NEW Park Name",
-  "location": "State",
-  "description": "Park Description",
-  "category": "State Park"
+   "date": "2023-12-13",
+   "cravingIntensity": 0,
+   "cigsSmoked": 5,
+   "notes": "Some test notes.",
 }
 ```
-> NOTE: When sending a `PUT` request, the Park's ID is _required_ in the body of the request.
+
+#### Sample Successful JSON Response
+`Status: 201 Created`
+```json
+{
+    "status": "Success",
+    "message": "Journal created successfully.",
+    "data": {
+        "journalId": 64,
+        "date": "2023-12-13",
+        "cravingIntensity": 0,
+        "cigsSmoked": 5,
+        "notes": "Something new.",
+        "userId": "1"
+    }
+}
+```
+
+..........................................................................................
+
+### `PUT` /api/users/{id}/journals/{journalId}
+
+Authenticated users, while including their Token in the authorization header of the request, may access this `PUT` endpoint to update a specific journal they have authored.
+
+**NOTE**: An authenticated user is only authorized to access and update their own journals. Attempting to access this endpoint with a User ID that does not belong to the authenticated user will result in an unsuccessful request. 
+
+#### Path Parameters
+| Parameter | Type | Default | Required | Description |
+| :---: | :---: | :---: | :---: | --- |
+| id        | int | none | true | Specify the desired user according to the given User ID. |
+| journalId | int | none | true | Specify the desired journal according to the given Journal ID. |
+
+#### Example Query
+```
+https://localhost:5001/api/users/1/journals/64
+```
+#### Sample JSON Request Body
+```json
+{
+   "journalId": 64,
+   "date": "2023-12-13",
+   "cravingIntensity": 10,
+   "cigsSmoked": 5,
+   "notes": "Some different notes.",
+}
+```
+> NOTE: When sending a `PUT` request, the Journal's ID is _required_ in the body of the request.
 
 #### Sample Successful JSON Response
 `Status: 204 No Content`
@@ -540,17 +605,22 @@ https://localhost:5001/api/parks/8
 
 ..........................................................................................
 
-### `DELETE` /api/parks/{id}
-Authenticated users, while including their Token in the authorization header of the request, may `DELETE` specific Park entries in the database when using the following format:
+
+### `DELETE` /api/users/{id}/journals/{id}
+
+Authenticated users, while including their Token in the authorization header of the request, may `DELETE` specific Journal entries in the database that they have authored.
+
+**NOTE**: An authenticated user is only authorized to access and update their own journals. Attempting to access this endpoint with a User ID that does not belong to the authenticated user will result in an unsuccessful request. 
 
 #### Path Parameters
 | Parameter | Type | Default | Required | Description |
 | :---: | :---: | :---: | :---: | --- |
-| id | int | none | true | Specify the desired Park according to the given Park ID. |
+| id        | int | none | true | Specify the desired user according to the given User ID. |
+| journalId | int | none | true | Specify the desired journal according to the given Journal ID. |
 
 #### Example Query
 ```
-https://localhost:5001/api/parks/8
+https://localhost:5001/api/users/1/journals/52
 ```
 
 #### Sample Successful JSON Response
@@ -561,80 +631,161 @@ https://localhost:5001/api/parks/8
 
 ..........................................................................................
 
-### `GET` /api/parks/random
-Any user may access the `Random` endpoint of the API. This endpoint returns a single random Park entry from the database.
+<!-- ### Journals Controller
 
-#### Path Parameters
-No parameters.
-
-#### Example Query
-```
-https://localhost:5001/api/parks/random
-```
-
-#### Sample Successful JSON Response
-`Status: 200 OK`
-```json
-{
-  "parkId": 6,
-  "name": "A Park",
-  "location": "State",
-  "description": "This is a State Park!",
-  "category": "State Park"
-}
-```
+Access functionality to create, read, update, or delete user journals. 
 
 ..........................................................................................
 
-### `GET` /api/parks/search
-Any user may access the `Search` endpoint of the API. This endpoint returns a paginated list of Park results that match the content of the user's search parameter.
+### `GET` /api/journals
 
-**NOTE**: By default, this endpoint returns a list of 10 Parks per page, starting from page 1. To continue searching through the query results, make sure to change the `pageNumber` parameter to search through each consecutive page available. 
+Authenticated users, while including their Token in the authorization header of the request, may access this `GET` endpoint. On a successful request, this endpoint returns a list of all Journals submitted by all registered users.
 
-The total number of pages available, `totalPages`, as well as reference to the user's position in the available page index as noted by `hasPreviousPage` and `hasNextPage`, will be marked in the body of the initial JSON Response, as shown below.
 
 #### Path Parameters
 | Parameter | Type | Default | Required | Description |
 | :---: | :---: | :---: | :---: | --- |
-| searchString | string | none | false | Returns a list of Park results that contains the content of the searchString in either their Name, Location, or Category. |
-| pageNumber | int | 1 | false |  Specifies which element in the response the pageSize limit should start counting from; default is the initial index of available elements. |
-| pageSize | int | 10 | false |  Returns the specified number of elements per response; default is 10 elements.|
+| No parameters |
+
 
 #### Example Query
 ```
-https://localhost:5001/api/parks/search?searchString=State
+https://localhost:5001/api/journals
 ```
 
 #### Sample Successful JSON Response
 `Status: 200 OK`
 ```json
 {
-    "pageNumber": 1,
-    "pageSize": 10,
-    "totalPages": 1,
-    "hasPreviousPage": false,
-    "hasNextPage": false,
+    "status": "Success",
+    "message": "Journals retrieved successfully.",
     "data": [
         {
-            "parkId": 3,
-            "name": "Cape Kiwanda",
-            "location": "Oregon",
-            "description": "This sandstone headland just north of Pacific City offers one of the best viewpoints on the coast for witnessing the ocean's power. The landmark is one of three along the Three Capes Scenic Route (along with Cape Meares and Cape Lookout).",
-            "category": "State Park"
+            "journalId": 52,
+            "date": "2023-12-13T16:58",
+            "cravingIntensity": 2,
+            "cigsSmoked": 3,
+            "notes": "Notes here.",
+            "userId": "1"
         },
         {
-            "parkId": 6,
-            "name": "A Park",
-            "location": "Somewhere",
-            "description": "This is a park, too!",
-            "category": "State Park"
+            "journalId": 53,
+            "date": "2023-12-04T16:58",
+            "cravingIntensity": 3,
+            "cigsSmoked": 5,
+            "notes": "Some more notes.",
+            "userId": "1"
         }
-    ],
-    "succeeded": true,
-    "errors": null,
-    "message": null
+    ]
 }
-``` -->
+```
+..........................................................................................
+
+### `POST` /api/journals/
+
+Authenticated users, while including their Token in the authorization header of the request, may access this `POST` endpoint to create a new journal entry.
+
+#### Path Parameters
+| Parameter | Type | Default | Required | Description |
+| :---: | :---: | :---: | :---: | --- |
+| No Parameters |
+
+#### Example Query
+```
+https://localhost:5001/api/journals/
+```
+#### Sample JSON Request Body
+```json
+{
+   "date": "2023-12-13",
+   "cravingIntensity": 0,
+   "cigsSmoked": 5,
+   "notes": "Some test notes.",
+}
+```
+
+#### Sample Successful JSON Response
+`Status: 201 Created`
+```json
+{
+    "status": "Success",
+    "message": "Journal created successfully.",
+    "data": {
+        "journalId": 64,
+        "date": "2023-12-13",
+        "cravingIntensity": 0,
+        "cigsSmoked": 5,
+        "notes": "Something new.",
+        "userId": "1"
+    }
+}
+```
+
+..........................................................................................
+
+### `PUT` /api/journals/{journalId}
+
+Authenticated users, while including their Token in the authorization header of the request, may access this `PUT` endpoint to update a specific journal.
+
+#### Path Parameters
+| Parameter | Type | Default | Required | Description |
+| :---: | :---: | :---: | :---: | --- |
+| id    | int | none | true | Specify the desired journal according to the given Journal ID. |
+
+#### Example Query
+```
+https://localhost:5001/api/journals/64
+```
+#### Sample JSON Request Body
+```json
+{
+   "journalId": 64,
+   "date": "2023-12-13",
+   "cravingIntensity": 10,
+   "cigsSmoked": 5,
+   "notes": "Some different notes.",
+}
+```
+> NOTE: When sending a `PUT` request, the Journal's ID is _required_ in the body of the request.
+
+#### Sample Successful JSON Response
+`Status: 204 No Content`
+```json
+
+```
+
+..........................................................................................
+
+### `DELETE` /api/journals/{id}
+
+Authenticated users, while including their Token in the authorization header of the request, may `DELETE` a specific Journal entry in the database.
+
+#### Path Parameters
+| Parameter | Type | Default | Required | Description |
+| :---: | :---: | :---: | :---: | --- |
+| id    | int | none | true | Specify the desired journal according to the given Journal ID. |
+
+#### Example Query
+```
+https://localhost:5001/api/journals/52
+```
+
+#### Sample Successful JSON Response
+`Status: 204 No Content`
+```json
+
+```
+
+.......................................................................................... -->
+
+### TO DO:
+
+### Milestones Controller
+
+Access functionality to read from a list of health benefits one might achieve over a period of time after they have quit smoking.
+
+..........................................................................................
+
 
 ------------------------------
 
@@ -664,17 +815,6 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
-
-<!-- ------------------------------
-
-### 🌟 Acknowledgments
-
-#### [Epicodus](https://www.epicodus.com/)
->"A school for tech careers... to help people learn the skills they need to get great jobs."
-
-#### [The Internet](https://webfoundation.org/)
-> "...the first thing that humanity has built that humanity doesn't understand..."
-> - Eric Schmidt, Google (Alphabet Inc.) -->
   
 ------------------------------
 
