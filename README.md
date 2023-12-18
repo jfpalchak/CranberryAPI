@@ -219,7 +219,7 @@ Explore the API endpoints in Postman or a browser. However, take note: you will 
 To explore the Cranberry API with NSwag, launch the project using `dotnet run` with the Terminal or Powershell, and input the following URL into your browser: `http://localhost:5000/swagger`
 
 ### Registering an Account and Using the JSON Web Token
-In order to be authorized to use the `POST`, `PUT`, and `DELETE` functionality of the API, please authenticate yourself through Postman:
+In order to be authorized to use the `GET`, `POST`, `PUT`, and `DELETE` functionality of the API, please authenticate yourself through Postman:
 
 #### Registration
 Again, we'll be using Postman for this example. Let's setup a `POST` request to the `users/register` endpoint. Select the 'Body' tab, choose the 'raw' radio button, and select 'JSON' from the dropdown selection.
@@ -235,7 +235,7 @@ In the Body of the Post request, use the following format:
 
 #### Example Query
 ```
-https://localhost:5001/api/users/register
+http://localhost:5000/api/users/register
 ```
 
 #### Sample JSON Response
@@ -268,7 +268,7 @@ In the Body of the Post request, use the following format:
 ```
 #### Example Query
 ```
-https://localhost:5001/api/users/signin
+http://localhost:5000/api/users/signin
 ```
 
 #### Sample JSON Response
@@ -294,9 +294,9 @@ Here's an example of what that should look like in Postman:
 
 Until the Token expires, you should now have access to all endpoints requiring user authorization!
 
-<!-- ### Note on CORS
+### Note on CORS
 CORS is a W3C standard that allows a server to relax the same-origin policy. It is not a security feature, CORS relaxes security. It allows a server to explicitly allow some cross-origin requests while rejecting others. An API is not safer by allowing CORS.
-For more information or to see how CORS functions, see the [Microsoft documentation](https://docs.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-2.2#how-cors). -->
+For more information or to see how CORS functions, see the [Microsoft documentation](https://docs.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-2.2#how-cors).
 
 <!-- ### Note on Pagination
 For certain endpoints, the Cranberry API returns a default of 10 results per page at a time, which is also the maximum number of results possible.
@@ -318,124 +318,168 @@ When adding more than one search parameter to an endpoint query, be sure to incl
 ### API Endpoints
 Base URL: `https://localhost:5001`
 
-<!-- #### HTTP Request Structure
 
-|          |                  Users                                  |
-|  :---:   |                      :---                               |
-| GET      | <a href="#get-apiparks"> /api/parks </a>                |
-| POST     | <a href="#post-apiparks"> /api/parks </a>               |  
-| GET      | <a href="#get-apiparksid"> /api/parks/{id} </a>         |
-| PUT      | <a href="#put-apiparksid"> /api/parks/{id} </a>         |
-| DELETE   | <a href="#delete-apiparksid"> /api/parks/{id} </a>      |
-|          |                                                         |
-| GET      | <a href="#get-apiparksrandom"> /api/parks/random </a>   |
-| GET      | <a href="#get-apiparkssearch"> /api/parks/search </a>   |
+|          |                      Users                                             |
+|  :---:   |                      :---                                              |
+| POST     | <a href="#get-apiusersregister"> /api/users/register </a>              |
+| POST     | <a href="#post-apiuserssignin"> /api/users/signin </a>                 |
+| GET      | <a href="#get-apiusersprofile"> /api/users/profile </a>                |  
+|          |                                                                        |
+| GET      | <a href="#get-apiusersid"> /api/users/{id} </a>                        |
+| PUT      | <a href="#put-apiusersid"> /api/users/{id} </a>                        |
+| DELETE   | <a href="#delete-apiusersid"> /api/users/{id} </a>                     |
+|          |                 Users / Journals                                       |
+| GET      | <a href="#get-apiusersidjournals"> /api/users/{id}/journals </a>       |
+| POST     | <a href="#get-apiusersidjournals"> /api/users/{id}/journals </a>       |
+| PUT      | <a href="#get-apiusersidjournals"> /api/users/{id}/journals/{id} </a>  |
+| DELETE   | <a href="#get-apiusersidjournals"> /api/users/{id}/journals/{id} </a>  |
 
-|          |                    Journals                             |
-|  :---:   |                      :---                               |
-| POST     | <a href="#registration"> /api/accounts/register </a>    |  
-| POST     | <a href="#sign-in"> /api/accounts/signin </a>           |  
-
-#### Example Query
-```
-https://localhost:5000/api/parks/1
-```
-
-#### Sample JSON Response
-```json
-{
-    "parkId": 1,
-    "name": "Acadia National Park",
-    "location": "Maine",
-    "description": "Today, Acadia preserves about 40,000 acres of Atlantic coast shoreline, mixed hardwood and spruce/fir forest, mountains, and lakes, as well as several offshore islands.",
-    "category": "National Park"
-}
-```
+|            |                    Journals                                            |
+|    :---:   |                      :---                                              |
+| GET        | <a href="#apijournals"> /api/journals/ </a>                            |  
+| POST       | <a href="#apijournals"> /api/journals/</a>                             |  
+| PUT        | <a href="#apijournals"> /api/journals/{id} </a>                        |  
+| DELETE     | <a href="#apijournals"> /api/journals/{id} </a>                        |  
 
 ..........................................................................................
 
-### Parks Controller
-Access information on available State and/or National Parks.
+### Users Controller
+Access functionality to register, sign-in & receive a Token, as well as edit or delete your account. The Users controller also contains endpoints for Users to create, read, update, or delete their own Journal entries.
 
 ..........................................................................................
 
-### `GET` /api/parks
-Any user may access this `GET` endpoint of the API. This endpoint returns a paginated list of available Parks in the database.
+### `GET` /api/users/profile
 
-**NOTE**: By default, this endpoint returns a list of 10 Parks per page, starting from page 1. To continue searching through the available parks, make sure to change the `pageNumber` parameter to search through each consecutive page available. 
+#### This is an alternative endpoint to `GET` `/api/users/{id}`
 
-The total number of pages available, `totalPages`, as well as reference to the user's position in the available page index as noted by `hasPreviousPage` and `hasNextPage`, will be marked in the body of the initial JSON Response, as shown below.
+Only authenticated users, while including their Token in the authorization header of the request, may access this `GET` endpoint. On a successful request, this endpoint returns the User's registered information.
+
+**NOTE**: An authenticated user is only authorized to retrieve their own information, and upon successfully calling this endpoint, will receive only their own registered information.
 
 #### Path Parameters
 | Parameter | Type | Default | Required | Description |
 | :---: | :---: | :---: | :---: | --- |
-| category | string | none | false | Return matches by category. **Must** be either 'State' or 'National'.
-| location | string | none | false | Return any Park found in the specified location. |
-| pageNumber | int | 1 | false |  Specifies which element in the response the pageSize limit should start counting from; default is the initial index of available elements. |
-| pageSize | int | 10 | false |  Returns the specified number of elements per response; default is 10 elements.|
-
+| No parameters.  |
 
 #### Example Query
 ```
-https://localhost:5001/api/parks?category=State&location=Oregon
+https://localhost:5001/api/users/1
 ```
 
-#### Sample Successful JSON Response
+#### Sample JSON Response
 `Status: 200 OK`
 ```json
 {
-    "pageNumber": 1,
-    "pageSize": 10,
-    "totalPages": 1,
-    "hasPreviousPage": false,
-    "hasNextPage": false,
-    "data": [
-        {
-            "parkId": 3,
-            "name": "Cape Kiwanda",
-            "location": "Oregon",
-            "description": "This sandstone headland just north of Pacific City offers one of the best viewpoints on the coast for witnessing the ocean's power. The landmark is one of three along the Three Capes Scenic Route (along with Cape Meares and Cape Lookout).",
-            "category": "State Park"
-        }
-    ],
-    "succeeded": true,
-    "errors": null,
-    "message": null
+    "status": "Success",
+    "message": "User info retrieved successfully.",
+    "data": {
+        "userId": "1",
+        "userName": "Joey",
+        "quitDate": "2023-12-15T12:27",
+        "avgSmokedDaily": 5,
+        "pricePerPack": 11.55,
+        "cigsPerPack": 20
+    }
 }
 ```
+
 ..........................................................................................
-### `POST` /api/parks
-Authenticated users, while including their Token in the authorization header of the request, may `POST` new Park entries to the database when using the following format:
+
+### `GET` /api/users/{id}
+
+#### This is an alternative endpoint to `GET` `/api/users/profile`
+
+Only authenticated users, while including their Token in the authorization header of the request, may access this `GET` endpoint. On a successful request, this endpoint returns the User's registered information.
+
+**NOTE**: An authenticated user is only authorized to retrieve their own information. If an ID belonging to an account other than the authenticated user is used, regardless of a present bearer token, the request will receive a 404 response.
 
 #### Path Parameters
-No parameters.
+| Parameter | Type | Default | Required | Description |
+| :---: | :---: | :---: | :---: | --- |
+| id | int | none | true | Specify the desired user according to the given User ID. |
 
 #### Example Query
 ```
-https://localhost:5001/api/parks
+https://localhost:5001/api/users/profile
+```
+
+#### Sample JSON Response
+`Status: 200 OK`
+```json
+{
+    "status": "Success",
+    "message": "User info retrieved successfully.",
+    "data": {
+        "userId": "1",
+        "userName": "Joey",
+        "quitDate": "2023-12-15T12:27",
+        "avgSmokedDaily": 5,
+        "pricePerPack": 11.55,
+        "cigsPerPack": 20
+    }
+}
+```
+
+..........................................................................................
+### `PUT` /api/user/{id}
+
+Authenticated users, while including their Token in the authorization header of the request, may access the `PUT` endpoint to update their registered information.
+
+**NOTE**: An authenticated user is only authorized to access and update their own information.
+
+#### Path Parameters
+| Parameter | Type | Default | Required | Description |
+| :---: | :---: | :---: | :---: | --- |
+| id | int | none | true | Specify the desired user according to the given User ID. |
+
+#### Example Query
+```
+https://localhost:5001/api/users/1
 ```
 #### Sample JSON Request Body
 ```json
 {
-  "name": "Park Name",
-  "location": "State",
-  "description": "Park Description",
-  "category": "State Park"
+     "userId": "1",
+     "userName": "Joey",
+     "quitDate": "2023-12-15T12:27",
+     "avgSmokedDaily": 10,
+     "pricePerPack": 12,
+     "cigsPerPack": 20
 }
+```
+> NOTE: When sending a `PUT` request, the Park's ID is _required_ in the body of the request.
+
+#### Sample Successful JSON Response
+`Status: 204 No Content`
+```json
+
+```
+..........................................................................................
+
+### `DELETE` /api/users/{id}
+Authenticated users, while including their Token in the authorization header of the request, may `DELETE` their own registered account
+
+**NOTE**: An authenticated user is only authorized to access and update their own information. Attempting to access this endpoint with a User ID that does not belong to the authenticated user will result in an unsuccessful request. 
+
+#### Path Parameters
+| Parameter | Type | Default | Required | Description |
+| :---: | :---: | :---: | :---: | --- |
+| id | int | none | true | Specify the desired user according to the given User ID. |
+
+#### Example Query
+```
+https://localhost:5001/api/users/1
 ```
 
 #### Sample Successful JSON Response
-`Status: 201 Created`
+`Status: 204 No Content`
 ```json
-{
-  "parkId": 8,
-  "name": "Park Name",
-  "location": "State",
-  "description": "Park Description",
-  "category": "State Park"
-}
+
 ```
+
 ..........................................................................................
+
+<!-- #### HTTP Request Structure
 
 ### `GET` /api/parks/{id}
 Any user may access this `GET` endpoint of the API. This endpoint returns a single Park entry that matches the given Park ID. 
