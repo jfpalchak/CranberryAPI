@@ -221,7 +221,7 @@ To explore the Cranberry API with NSwag, launch the project using `dotnet run` w
 ### Registering an Account and Using the JSON Web Token
 In order to be authorized to use the `GET`, `POST`, `PUT`, and `DELETE` functionality of the API, please authenticate yourself through Postman:
 
-### Registration
+### `POST` Register
 Again, we'll be using Postman for this example. Let's setup a `POST` request to the `users/register` endpoint. Select the 'Body' tab, choose the 'raw' radio button, and select 'JSON' from the dropdown selection.
 
 In the Body of the Post request, use the following format:
@@ -321,14 +321,14 @@ Base URL: `https://localhost:5001`
 
 |          |                      Users                                             |
 |  :---:   |                      :---                                              |
-| POST     | <a href="#register"> /api/users/register </a>                          |
-| POST     | <a href="#signin"> /api/users/signin </a>                              |
+| POST     | <a href="#post-register"> /api/users/register </a>                          |
+| POST     | <a href="#post-signin"> /api/users/signin </a>                              |
 | GET      | <a href="#get-apiusersprofile"> /api/users/profile </a>                |  
 |          |                                                                        |
 | GET      | <a href="#get-apiusersid"> /api/users/{id} </a>                        |
 | PUT      | <a href="#put-apiusersid"> /api/users/{id} </a>                        |
 | DELETE   | <a href="#delete-apiusersid"> /api/users/{id} </a>                     |
-|          |                 Users / Journals                                       |
+|          |                 User Journals                                          |
 | GET      | <a href="#get-apiusersidjournals"> /api/users/{id}/journals </a>       |
 | POST     | <a href="#get-apiusersidjournals"> /api/users/{id}/journals </a>       |
 | PUT      | <a href="#get-apiusersidjournals"> /api/users/{id}/journals/{id} </a>  |
