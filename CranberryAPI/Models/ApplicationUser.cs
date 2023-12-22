@@ -6,6 +6,7 @@ namespace CranberryAPI.Models;
 public class ApplicationUser : IdentityUser
 {
 
+  // public string DisplayName { get; set; }
   public string QuitDate { get; set; }
   public int AvgSmokedDaily { get; set; }
   public float PricePerPack { get; set; }
