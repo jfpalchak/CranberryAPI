@@ -13,8 +13,7 @@ builder.Services.AddCors(options =>
   options.AddPolicy(name: MyAllowSpecificOrigins,
                     policy => 
                     {
-                      policy.WithOrigins("http://localhost:3000", 
-                                          "https://cranberry-quit.vercel.app",
+                      policy.WithOrigins("http://localhost:3000",
                                           "https://cranberry-axec.onrender.com")
                       .AllowAnyMethod()
                       .AllowAnyHeader();
