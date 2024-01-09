@@ -97,6 +97,7 @@ Only authenticated users have access to `GET`, `POST`, `PUT`, and `DELETE` funct
 * [JWT Bearer](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.authentication.jwtbearer)
 * [Swagger - NSwag 13.3.0](https://docs.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-nswag?view=aspnetcore-3.1&tabs=visual-studio)
 * [Postman](https://www.postman.com/)
+* [Docker](https://docs.docker.com/)
 
 <!-- ### 🔍 Preview -->
 
