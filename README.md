@@ -46,11 +46,11 @@
 </p>
 
 <!-- Project Links -->
-<p align="center">
+<!-- <p align="center">
     <a href="https://github.com/jfpalchak/CranberryAPI.git"><big>Project Docs</big></a> ·
     <a href="https://github.com/jfpalchak/CranberryAPI/issues"><big>Report Bug</big></a> ·
     <a href="https://github.com/jfpalchak/CranberryAPI/issues"><big>Request Feature</big></a>
-</p>
+</p> -->
 
 ------------------------------
 ### <u>Table of Contents</u>
@@ -80,8 +80,6 @@
 The Cranberry API allows users to both register and sign in to their own account, as well as post, put, and delete their own Journal entries and account information. This API utilizes RESTful principles, as well as Json Web Tokens (JWT) for authentication & authorization.
 
 Only authenticated users have access to `GET`, `POST`, `PUT`, and `DELETE` functionality throughout the API.
-
-<!-- Any endpoint in the API that returns a _list_ of Journals utilizes Pagination.  -->
 
 ### 🦠 Known Bugs
 
@@ -818,4 +816,4 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
   
 ------------------------------
 
-<center><a href="#">Return to Top</a></center>
+<center><a href="#--cranberry-api">Return to Top</a></center>
