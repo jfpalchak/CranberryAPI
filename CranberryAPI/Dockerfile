@@ -18,5 +18,4 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
 WORKDIR /app
 COPY --from=build /app/out .
-COPY certs/ca.pem /app/certs/ca.pem
 ENTRYPOINT ["dotnet", "CranberryAPI.dll"]
