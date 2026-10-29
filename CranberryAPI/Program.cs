@@ -60,6 +60,12 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<CranberryAPI.Models.CranberryAPIContext>();
+    dbContext.Database.Migrate();
+}
+
 if (app.Environment.IsDevelopment())
 {
   app.UseSwagger();
@@ -70,6 +76,8 @@ else
   app.UseHttpsRedirection();
 }
 
+
+
 app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthentication();
@@ -78,5 +86,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
+app.MapGet("/", () => Results.Ok(new { status = "ok" }));
 
 app.Run();
