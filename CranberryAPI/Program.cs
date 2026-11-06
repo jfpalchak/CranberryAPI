@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using CranberryAPI.Models;
+using CranberryAPI.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +22,9 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddControllers();
+
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Email"));
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddDbContext<CranberryAPIContext>(
                   dbContextOptions => dbContextOptions
@@ -60,6 +64,13 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<CranberryAPI.Models.CranberryAPIContext>();
+    dbContext.Database.Migrate();
+}
+
+
 if (app.Environment.IsDevelopment())
 {
   app.UseSwagger();
@@ -70,6 +81,8 @@ else
   app.UseHttpsRedirection();
 }
 
+
+
 app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthentication();
@@ -77,5 +90,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
+app.MapGet("/", () => Results.Ok(new { status = "ok" }));
 
 app.Run();
