@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using CranberryAPI.Models;
+using CranberryAPI.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +22,9 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddControllers();
+
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Email"));
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddDbContext<CranberryAPIContext>(
                   dbContextOptions => dbContextOptions
@@ -65,6 +69,7 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<CranberryAPI.Models.CranberryAPIContext>();
     dbContext.Database.Migrate();
 }
+
 
 if (app.Environment.IsDevelopment())
 {
