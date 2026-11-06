@@ -1,0 +1,46 @@
+name: Deploy to Oracle
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # cho phép bấm chạy tay trong tab Actions
+
+# Không cho 2 lần deploy chạy chồng lên nhau
+concurrency:
+  group: deploy-oracle
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.ORACLE_SSH_KEY }}" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          ssh-keyscan -H "${{ secrets.ORACLE_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Pull code & restart containers on server
+        run: |
+          ssh -i ~/.ssh/id_deploy "${{ secrets.ORACLE_USER }}@${{ secrets.ORACLE_HOST }}" bash -se <<'EOF'
+          set -euo pipefail
+          cd ~/mycode/diary-app
+          git fetch origin main
+          git reset --hard origin/main
+          docker compose up -d --build --remove-orphans
+          docker image prune -f
+
+          # Chờ API lên (tối đa ~60s)
+          for i in $(seq 1 12); do
+            if curl -fsS http://localhost:8080/health > /dev/null; then
+              echo "Deploy OK"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "API không phản hồi /health" >&2
+          docker compose logs --tail=100 api
+          exit 1
+          EOF
