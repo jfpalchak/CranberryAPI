@@ -1,21 +1,22 @@
-# Set the base image to .NET 6 SDK
+# ---------- Build stage ----------
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+WORKDIR /src
 
-# Set the working directory to /app
-WORKDIR /app
-
-# Copy the project file(s) and restore dependencies
+# Restore trước để tận dụng cache layer
 COPY *.csproj ./
 RUN dotnet restore
 
-# Copy the remaining source code
+# Copy source (bin/obj/.env đã bị loại bởi .dockerignore)
 COPY . .
+RUN dotnet publish -c Release -o /app/out --no-restore
 
-# Build the application
-RUN dotnet publish -c Release -o out
-
-# Create the runtime image
+# ---------- Runtime stage ----------
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
 WORKDIR /app
 COPY --from=build /app/out .
+
+# Lắng nghe HTTP trên port 8080 trong container
+ENV ASPNETCORE_URLS=http://+:8080
+EXPOSE 8080
+
 ENTRYPOINT ["dotnet", "CranberryAPI.dll"]

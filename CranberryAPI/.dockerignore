@@ -1,0 +1,11 @@
+bin/
+obj/
+.env
+.env.*
+certs/
+*.pem
+Dockerfile
+.dockerignore
+.vs/
+.vscode/
+*.user
